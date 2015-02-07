@@ -64,7 +64,6 @@ public class FactualLocationProvider implements LocationProvider{
     }
     String url = FACTUAL_API_URL + "?limit=" + limit + (sortStr==null ? "" : "&" + sortStr) + "&" + categoryPred
           + "&" + geoPred + "&KEY=nXD7KzX7ZtIHvzaVmwveUURbdQdA6Rx2cvvefSkz";
-    System.out.println(url);
     return url;
   }
 

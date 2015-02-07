@@ -22,7 +22,6 @@ public class RateLimiter {
     currentBudget = Math.min(maxBudget,
         currentBudget + msSinceLastUpdate * fillRatePerMs);
     lastUpdateTime += msSinceLastUpdate;
-    System.out.println("currentBudget " + currentBudget);
     if (currentBudget >= amount) {
       currentBudget -= amount;
       return new RateLimiterResponse(true,0.0);

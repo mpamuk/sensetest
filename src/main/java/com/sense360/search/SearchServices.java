@@ -20,7 +20,7 @@ public class SearchServices {
   private static final com.sense360.api.ratelimit.RateLimiter mrl = new com.sense360.api.ratelimit.RateLimiter(5.0, FILL_RATE_PER_MS);
 
 
-  public static String testPois(String latitude, String longitude, String radius)
+  public static String place(String latitude, String longitude, String radius)
   {
     RateLimiterResponse rateLimiterResponse = mrl.consume(2.0);
     JSONObject errorObj = new JSONObject();
