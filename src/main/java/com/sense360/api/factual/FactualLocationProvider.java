@@ -22,23 +22,23 @@ public class FactualLocationProvider implements LocationProvider{
 
   private static final String DISTANCE = "distance";
   private static final String PLACE_RANK = "placeRank";
-  private static final int RESTAURANT_MAX_CATEGORY_ID = 368;
-  private static final int RESTAURANT_MIN_CATEGORY_ID = 347;
-  private static final Object BAR_CATEGORY_ID = 312;
+  private static final Integer RESTAURANT_MAX_CATEGORY_ID = 368;
+  private static final Integer RESTAURANT_MIN_CATEGORY_ID = 347;
+  private static final Integer RESTAURANT_CATEGORY_ID = 347;
+  private static final Integer BAR_CATEGORY_ID = 312;
 
 
   public TopPOIResponse topPOIs(LocationSearchParams lsp)  throws Exception{
-    List<POI> poisByDistance = getPoisFromService(lsp,DISTANCE);
-    List<POI>poisByPlaceRank = getPoisFromService(lsp, PLACE_RANK);
+    List<POI> poisByDistance = getPOIsFromService(lsp,DISTANCE);
+    List<POI>poisByPlaceRank = getPOIsFromService(lsp, PLACE_RANK);
     TopPOIResponse tpr = new TopPOIResponse(poisByDistance, poisByPlaceRank);
     return tpr;
   }
 
-
-  public List<POI> getPoisFromService(LocationSearchParams lsp, String sortKey) throws InterruptedException, ExecutionException{
+  private List<POI> getPOIsFromService(LocationSearchParams lsp, String sortKey) throws InterruptedException, ExecutionException{
     Query q = new Query();
     q.and(
-      q.field("category_ids").includesAny(BAR_CATEGORY_ID,RESTAURANT_MIN_CATEGORY_ID),
+      q.field("category_ids").includesAny(BAR_CATEGORY_ID, RESTAURANT_CATEGORY_ID),
         q.within(new Circle(lsp.getLatitude(), lsp.getLongitude(), lsp.getRadius())))
          .limit(lsp.getLimit());
     if (sortKey.equals(DISTANCE)){

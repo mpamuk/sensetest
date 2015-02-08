@@ -15,9 +15,11 @@ import com.sense360.model.POI;
 public class SearchServices {
 
 
+  private static final int LIMIT = 20;
+
   public static String place(String latitude, String longitude, String radius)
   {
-    LocationSearchParams lsp = new LocationSearchParams(Double.parseDouble(latitude), Double.parseDouble(longitude), Integer.parseInt(radius),20);
+    LocationSearchParams lsp = new LocationSearchParams(Double.parseDouble(latitude), Double.parseDouble(longitude), Integer.parseInt(radius),LIMIT);
     LocationProvider locationProvider = new FactualLocationProvider();
     JSONObject errorObj = new JSONObject();
 
@@ -26,7 +28,6 @@ public class SearchServices {
       tpr = locationProvider.topPOIs(lsp);
     }
     catch (Exception e){
-      e.printStackTrace();
       errorObj.put("message", e.getMessage());
       return errorObj.toString();
     }
@@ -63,9 +64,6 @@ public class SearchServices {
     sortKeyObj.put("restaurants", sortKeyRestaurantObj);
     return sortKeyObj;
   }
-
-
-
 
 
 }
