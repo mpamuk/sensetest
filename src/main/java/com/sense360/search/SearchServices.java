@@ -1,13 +1,14 @@
 package com.sense360.search;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.JSONObject;
 
-import com.sense360.api.FactualLocationProvider;
 import com.sense360.api.LocationProvider;
 import com.sense360.api.LocationSearchParams;
-import com.sense360.api.ratelimit.RateLimiterResponse;
+import com.sense360.api.factual.FactualLocationProvider;
 import com.sense360.dao.POI;
 import com.sense360.dao.TopPOIResponse;
 
@@ -15,24 +16,21 @@ import com.sense360.dao.TopPOIResponse;
 
 public class SearchServices {
 
-
-  private static final double FILL_RATE_PER_MS =  0.00001;
-  private static final com.sense360.api.ratelimit.RateLimiter mrl = new com.sense360.api.ratelimit.RateLimiter(5.0, FILL_RATE_PER_MS);
+  private final static ExecutorService executor = Executors.newFixedThreadPool(5);
 
 
   public static String place(String latitude, String longitude, String radius)
   {
-    RateLimiterResponse rateLimiterResponse = mrl.consume(2.0);
     JSONObject errorObj = new JSONObject();
 
-    if (rateLimiterResponse.isCanConsume()) {
-      LocationSearchParams lsp = new LocationSearchParams(Double.parseDouble(latitude), Double.parseDouble(longitude), Integer.parseInt(radius),20);
-      LocationProvider locationProvider = new FactualLocationProvider();
+    LocationSearchParams lsp = new LocationSearchParams(Double.parseDouble(latitude), Double.parseDouble(longitude), Integer.parseInt(radius),20);
+    LocationProvider locationProvider = new FactualLocationProvider();
       TopPOIResponse tpr = null;
       try {
-        tpr = locationProvider.topPOIs(lsp);
+        tpr = locationProvider.topPOIs(lsp, executor);
       }
       catch (Exception e){
+        e.printStackTrace();
         errorObj.put("message", e.getMessage());
         return errorObj.toString();
       }
@@ -40,15 +38,8 @@ public class SearchServices {
       List<POI>poisByPlaceRank = tpr.getTopPoisByPlaceRank();
       JSONObject responseObj = createResponseObject(poisByDistance, poisByPlaceRank);
       return responseObj.toString();
-    }
-    else {
-      errorObj.put("message",  "Location API limit exceeded wait for " + rateLimiterResponse.getWaitTime() + " seconds");
-      return errorObj.toString();
-    }
+
   }
-
-
-
 
 
   private static JSONObject createResponseObject(List<POI> poisByDistance, List<POI> poisByPlaceRank) {

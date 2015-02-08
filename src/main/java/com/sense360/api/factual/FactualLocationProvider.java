@@ -1,25 +1,22 @@
-package com.sense360.api;
+package com.sense360.api.factual;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.factual.driver.Circle;
+import com.factual.driver.Query;
+import com.sense360.api.LocationProvider;
+import com.sense360.api.LocationSearchParams;
 import com.sense360.dao.POI;
 import com.sense360.dao.TopPOIResponse;
-import com.sense360.dao.http.Request;
-import com.sense360.dao.http.Response;
-import com.sense360.util.IOUtil;
 
 public class FactualLocationProvider implements LocationProvider{
 
@@ -27,56 +24,33 @@ public class FactualLocationProvider implements LocationProvider{
   private static final String PLACE_RANK = "placeRank";
   private static final int RESTAURANT_MAX_CATEGORY_ID = 368;
   private static final int RESTAURANT_MIN_CATEGORY_ID = 347;
-  private static final String FACTUAL_API_URL = "http://api.v3.factual.com/t/places-us";
   private static final Object BAR_CATEGORY_ID = 312;
 
 
-  public TopPOIResponse topPOIs(LocationSearchParams lsp)  throws Exception{
-    ExecutorService executor = Executors.newFixedThreadPool(1);
-    String urlForDistance = assembleUrlForSort(lsp, DISTANCE);
-
-    List<POI> poisByDistance;
-    poisByDistance = getPoisFromService(executor, urlForDistance);
-    String urlForPlaceRank = assembleUrlForSort(lsp, PLACE_RANK);
-    List<POI>poisByPlaceRank = getPoisFromService(executor, urlForPlaceRank);
-    executor.shutdown();
+  public TopPOIResponse topPOIs(LocationSearchParams lsp, ExecutorService executor)  throws Exception{
+    List<POI> poisByDistance = getPoisFromService(lsp,DISTANCE, executor);
+    List<POI>poisByPlaceRank = getPoisFromService(lsp, PLACE_RANK, executor);
     TopPOIResponse tpr = new TopPOIResponse(poisByDistance, poisByPlaceRank);
     return tpr;
   }
 
 
 
-  private String assembleUrlForSort(LocationSearchParams lsp, String sortKey) {
-    double latitude = lsp.getLatitude();
-    double longitude = lsp.getLongitude();
-    int radius = lsp.getRadius();
-    int limit = lsp.getLimit();
-    String geoPred = "geo={\"$circle\":{\"$center\":[" + latitude + "," + longitude + "],\"$meters\":" + radius + "}}";
-    String categoryPred = "filters={\"category_ids\":{\"$includes_any\":[312,347]}}";
-    geoPred = geoPred.replaceAll("\"", "%22");
-    categoryPred = categoryPred.replaceAll("\"", "%22");
-    String sortStr = null;
+  public List<POI> getPoisFromService(LocationSearchParams lsp, String sortKey,ExecutorService executor ) throws InterruptedException, ExecutionException{
+    Query q = new Query();
+    q.and(
+      q.field("category_ids").includesAny(BAR_CATEGORY_ID,RESTAURANT_MIN_CATEGORY_ID),
+        q.within(new Circle(lsp.getLatitude(), lsp.getLongitude(), lsp.getRadius())))
+         .limit(lsp.getLimit());
     if (sortKey.equals(DISTANCE)){
-      sortStr = "sort=$distance";
+      q.sortAsc("$distance");
     }
     else if (sortKey.equals(PLACE_RANK)){
-      sortStr = "sort=placerank:desc";
+      q.sortDesc("placerank");
     }
-    String url = FACTUAL_API_URL + "?limit=" + limit + (sortStr==null ? "" : "&" + sortStr) + "&" + categoryPred
-          + "&" + geoPred + "&KEY=nXD7KzX7ZtIHvzaVmwveUURbdQdA6Rx2cvvefSkz";
-    return url;
-  }
-
-
-
-
-  private List<POI> getPoisFromService(ExecutorService executor, String url) throws MalformedURLException, InterruptedException, ExecutionException {
-
-    Future<Response> response = executor.submit(new Request(new URL(url)));
-    InputStream body = response.get().getBody();
-    String content = IOUtil.getStringFromInputStream(body);
-    List<POI>poisByDistance = parsePOIs(content);
-    return poisByDistance;
+      Future<FactualResponse> response = executor.submit(new FactualRequest(q));
+    List<POI>pois = parsePOIs(response.get().getBody());
+    return pois;
   }
 
 
