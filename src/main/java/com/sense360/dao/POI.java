@@ -8,17 +8,12 @@ public class POI {
   private boolean isBar;
   private boolean isRestaurant;
 
-
-
   public POI(String name, double distanceFromQueryLocation, boolean isBar, boolean isRestaurant) {
-    super();
     this.name = name;
     this.distanceFromQueryLocation = distanceFromQueryLocation;
     this.isBar = isBar;
     this.isRestaurant = isRestaurant;
   }
-
-
 
   public String getName() {
     return name;
@@ -36,16 +31,13 @@ public class POI {
     this.distanceFromQueryLocation = distance;
   }
 
-
   public boolean isBar() {
     return isBar;
   }
 
-
   public void setBar(boolean isBar) {
     this.isBar = isBar;
   }
-
 
   public boolean isRestaurant() {
     return isRestaurant;

@@ -21,28 +21,28 @@ public class SearchServices {
 
   public static String place(String latitude, String longitude, String radius)
   {
-    JSONObject errorObj = new JSONObject();
-
     LocationSearchParams lsp = new LocationSearchParams(Double.parseDouble(latitude), Double.parseDouble(longitude), Integer.parseInt(radius),20);
     LocationProvider locationProvider = new FactualLocationProvider();
-      TopPOIResponse tpr = null;
-      try {
-        tpr = locationProvider.topPOIs(lsp, executor);
-      }
-      catch (Exception e){
-        e.printStackTrace();
-        errorObj.put("message", e.getMessage());
-        return errorObj.toString();
-      }
-      List<POI>poisByDistance = tpr.getTopPoisByDistance();
-      List<POI>poisByPlaceRank = tpr.getTopPoisByPlaceRank();
-      JSONObject responseObj = createResponseObj(poisByDistance, poisByPlaceRank);
-      return responseObj.toString();
+    JSONObject errorObj = new JSONObject();
+
+    TopPOIResponse tpr = null;
+    try {
+      tpr = locationProvider.topPOIs(lsp, executor);
+    }
+    catch (Exception e){
+      e.printStackTrace();
+      errorObj.put("message", e.getMessage());
+      return errorObj.toString();
+    }
+    List<POI>poisByDistance = tpr.getTopPoisByDistance();
+    List<POI>poisByPlaceRank = tpr.getTopPoisByPlaceRank();
+    JSONObject responseObj = createResponseObject(poisByDistance, poisByPlaceRank);
+    return responseObj.toString();
 
   }
 
 
-  private static JSONObject createResponseObj(List<POI> poisByDistance, List<POI> poisByPlaceRank) {
+  private static JSONObject createResponseObject(List<POI> poisByDistance, List<POI> poisByPlaceRank) {
     JSONObject responseObj = new JSONObject();
     JSONObject distanceObj = getPOIObjBySortKey(poisByDistance);
     JSONObject placeRankObj = getPOIObjBySortKey(poisByPlaceRank);
@@ -67,8 +67,6 @@ public class SearchServices {
     sortKeyObj.put("restaurants", sortKeyRestaurantObj);
     return sortKeyObj;
   }
-
-
 
 
 
