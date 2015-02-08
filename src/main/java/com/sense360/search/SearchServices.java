@@ -36,24 +36,23 @@ public class SearchServices {
       }
       List<POI>poisByDistance = tpr.getTopPoisByDistance();
       List<POI>poisByPlaceRank = tpr.getTopPoisByPlaceRank();
-      JSONObject responseObj = createResponseObject(poisByDistance, poisByPlaceRank);
+      JSONObject responseObj = createResponseObj(poisByDistance, poisByPlaceRank);
       return responseObj.toString();
 
   }
 
 
-  private static JSONObject createResponseObject(List<POI> poisByDistance, List<POI> poisByPlaceRank) {
+  private static JSONObject createResponseObj(List<POI> poisByDistance, List<POI> poisByPlaceRank) {
     JSONObject responseObj = new JSONObject();
-    JSONObject distanceObj = new JSONObject();
-    JSONObject placeRankObj = new JSONObject();
-    addPois(distanceObj, poisByDistance);
-    addPois(placeRankObj, poisByPlaceRank);
+    JSONObject distanceObj = getPOIObjBySortKey(poisByDistance);
+    JSONObject placeRankObj = getPOIObjBySortKey(poisByPlaceRank);
     responseObj.put("distance", distanceObj);
     responseObj.put("place rank", placeRankObj);
     return responseObj;
   }
 
-  private static void addPois(JSONObject sortKeyObj, List<POI> poisBySortKey) {
+  private static JSONObject getPOIObjBySortKey(List<POI> poisBySortKey) {
+    JSONObject sortKeyObj = new JSONObject();
     JSONObject sortKeyBarsObj = new JSONObject();
     JSONObject sortKeyRestaurantObj = new JSONObject();
     for (POI poi : poisBySortKey){
@@ -66,6 +65,7 @@ public class SearchServices {
     }
     sortKeyObj.put("bars", sortKeyBarsObj);
     sortKeyObj.put("restaurants", sortKeyRestaurantObj);
+    return sortKeyObj;
   }
 
 
