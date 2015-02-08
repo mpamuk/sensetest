@@ -8,7 +8,6 @@ public class TopPOIResponse {
   private List<POI>topPoisByPlaceRank;
 
   public TopPOIResponse(List<POI> topPoisByDistance, List<POI> topPoisByPlaceRank) {
-    super();
     this.topPoisByDistance = topPoisByDistance;
     this.topPoisByPlaceRank = topPoisByPlaceRank;
   }

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.json.JSONArray;
@@ -13,6 +12,7 @@ import org.json.JSONObject;
 
 import com.factual.driver.Circle;
 import com.factual.driver.Query;
+import com.sense360.api.APIExecutorService;
 import com.sense360.api.LocationProvider;
 import com.sense360.api.LocationSearchParams;
 import com.sense360.dao.POI;
@@ -27,16 +27,16 @@ public class FactualLocationProvider implements LocationProvider{
   private static final Object BAR_CATEGORY_ID = 312;
 
 
-  public TopPOIResponse topPOIs(LocationSearchParams lsp, ExecutorService executor)  throws Exception{
-    List<POI> poisByDistance = getPoisFromService(lsp,DISTANCE, executor);
-    List<POI>poisByPlaceRank = getPoisFromService(lsp, PLACE_RANK, executor);
+  public TopPOIResponse topPOIs(LocationSearchParams lsp)  throws Exception{
+    List<POI> poisByDistance = getPoisFromService(lsp,DISTANCE);
+    List<POI>poisByPlaceRank = getPoisFromService(lsp, PLACE_RANK);
     TopPOIResponse tpr = new TopPOIResponse(poisByDistance, poisByPlaceRank);
     return tpr;
   }
 
 
 
-  public List<POI> getPoisFromService(LocationSearchParams lsp, String sortKey,ExecutorService executor ) throws InterruptedException, ExecutionException{
+  public List<POI> getPoisFromService(LocationSearchParams lsp, String sortKey) throws InterruptedException, ExecutionException{
     Query q = new Query();
     q.and(
       q.field("category_ids").includesAny(BAR_CATEGORY_ID,RESTAURANT_MIN_CATEGORY_ID),
@@ -48,7 +48,7 @@ public class FactualLocationProvider implements LocationProvider{
     else if (sortKey.equals(PLACE_RANK)){
       q.sortDesc("placerank");
     }
-      Future<FactualResponse> response = executor.submit(new FactualRequest(q));
+      Future<FactualResponse> response = APIExecutorService.executorService.submit(new FactualRequest(q));
     List<POI>pois = parsePOIs(response.get().getBody());
     return pois;
   }

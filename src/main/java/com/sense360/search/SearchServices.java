@@ -1,8 +1,6 @@
 package com.sense360.search;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.json.JSONObject;
 
@@ -16,8 +14,6 @@ import com.sense360.dao.TopPOIResponse;
 
 public class SearchServices {
 
-  private final static ExecutorService executor = Executors.newFixedThreadPool(5);
-
 
   public static String place(String latitude, String longitude, String radius)
   {
@@ -27,7 +23,7 @@ public class SearchServices {
 
     TopPOIResponse tpr = null;
     try {
-      tpr = locationProvider.topPOIs(lsp, executor);
+      tpr = locationProvider.topPOIs(lsp);
     }
     catch (Exception e){
       e.printStackTrace();
@@ -67,6 +63,8 @@ public class SearchServices {
     sortKeyObj.put("restaurants", sortKeyRestaurantObj);
     return sortKeyObj;
   }
+
+
 
 
 
