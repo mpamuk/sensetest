@@ -6,9 +6,9 @@ import org.json.JSONObject;
 
 import com.sense360.api.LocationProvider;
 import com.sense360.api.LocationSearchParams;
+import com.sense360.api.TopPOIResponse;
 import com.sense360.api.factual.FactualLocationProvider;
-import com.sense360.dao.POI;
-import com.sense360.dao.TopPOIResponse;
+import com.sense360.model.POI;
 
 
 

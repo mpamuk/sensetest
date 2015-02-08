@@ -15,8 +15,8 @@ import com.factual.driver.Query;
 import com.sense360.api.APIExecutorService;
 import com.sense360.api.LocationProvider;
 import com.sense360.api.LocationSearchParams;
-import com.sense360.dao.POI;
-import com.sense360.dao.TopPOIResponse;
+import com.sense360.api.TopPOIResponse;
+import com.sense360.model.POI;
 
 public class FactualLocationProvider implements LocationProvider{
 
@@ -33,7 +33,6 @@ public class FactualLocationProvider implements LocationProvider{
     TopPOIResponse tpr = new TopPOIResponse(poisByDistance, poisByPlaceRank);
     return tpr;
   }
-
 
 
   public List<POI> getPoisFromService(LocationSearchParams lsp, String sortKey) throws InterruptedException, ExecutionException{

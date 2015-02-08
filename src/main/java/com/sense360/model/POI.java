@@ -1,4 +1,4 @@
-package com.sense360.dao;
+package com.sense360.model;
 
 
 public class POI {

@@ -1,6 +1,8 @@
-package com.sense360.dao;
+package com.sense360.api;
 
 import java.util.List;
+
+import com.sense360.model.POI;
 
 public class TopPOIResponse {
 
